@@ -94,11 +94,11 @@ export function getHeightEvaluator(
 //  ------------
 // |            |
 //      ...
-export function getBaseEvaluator(headerHeight: number, footerHeight: number) {
-  const argument = { headerHeight, footerHeight };
+export function getBaseEvaluator(headerHeight: number, footerHeight: number, fixHeaderMargin = 0) {
+  const argument = { headerHeight, footerHeight, fixHeaderMargin };
   type ArgumentType = typeof argument;
 
-  const pageFunc = ({ headerHeight, footerHeight }: ArgumentType) => {
+  const pageFunc = ({ headerHeight, footerHeight, fixHeaderMargin }: ArgumentType) => {
     const header = document.getElementById("header");
     const footer = document.getElementById("footer");
 
@@ -129,7 +129,7 @@ export function getBaseEvaluator(headerHeight: number, footerHeight: number) {
       }
     };
 
-    evaluate(header, headerHeight, true);
+    evaluate(header, headerHeight - fixHeaderMargin, true);
     evaluate(footer, footerHeight, false);
   };
 

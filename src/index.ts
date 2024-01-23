@@ -2,6 +2,10 @@ import * as fs from "fs";
 import * as core from "./core";
 import type { Page, Browser, PDFOptions } from "./types";
 
+type CustomPDFOptions = PDFOptions & {
+  fixHeaderMargin?: number;
+}
+
 /**
  * Convert HTML file to PDF
  * @param browser puppeteer/puppeteer-core browser object
@@ -9,7 +13,7 @@ import type { Page, Browser, PDFOptions } from "./types";
  * @param options output PDF options
  * @returns PDF as an array of bytes
  */
-async function pdf(browser: Browser, file: string, options?: PDFOptions) {
+async function pdf(browser: Browser, file: string, options?: CustomPDFOptions) {
   const page = await browser.newPage();
   try {
     await page.goto("file:///" + file);
@@ -26,8 +30,8 @@ async function pdf(browser: Browser, file: string, options?: PDFOptions) {
  * @param options output PDF options
  * @returns PDF as an array of bytes
  */
-async function pdfPage(page: Page, options?: PDFOptions): Promise<Uint8Array> {
-  const { path, ...pdfOptions } = options ?? {};
+async function pdfPage(page: Page, options?: CustomPDFOptions): Promise<Uint8Array> {
+  const { path, fixHeaderMargin, ...pdfOptions } = options ?? {};
   const margin = {
     marginTop: pdfOptions?.margin?.top ?? 0,
     marginBottom: pdfOptions?.margin?.bottom ?? 0,
@@ -46,7 +50,8 @@ async function pdfPage(page: Page, options?: PDFOptions): Promise<Uint8Array> {
 
   const [basePageEvalFunc, basePageEvalArg] = core.getBaseEvaluator(
     headerHeight,
-    footerHeight
+    footerHeight,
+    fixHeaderMargin || 0
   );
   await page.evaluate(basePageEvalFunc, basePageEvalArg);
 
